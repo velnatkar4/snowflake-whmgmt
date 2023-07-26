@@ -2,8 +2,6 @@
 
 This README contains the overview and environment setup instructions.
 
-Here is an overview of what we'll build in this lab:
-
 ## Step 1 - Setup Snowflake Environement
 
 This step create the necessary user, role, warehouse, database, and schema for hosting Warehouse management application. We will create 3 warehouse for user to choose based on workload demand SMALL, MEDICUM AND LARGE.
