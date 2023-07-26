@@ -2,6 +2,8 @@
 
 This README contains the overview and environment setup instructions.
 
+Here is an overview of what we'll build in this lab:
+
 ## Step 1 - Setup Snowflake Environement
 
 This step create the necessary user, role, warehouse, database, and schema for hosting Warehouse management application. We will create 3 warehouse for user to choose based on workload demand SMALL, MEDICUM AND LARGE.
@@ -16,8 +18,6 @@ Python 3.9 version is required to run the application that is hosted on Stramlit
 
 ## Step 2.1 - Use Pre-Build Codespace
 Start the pre-build Codespace from: (https://github.com/velnatkar4/snowflake-whmgmt/codespaces)
-
-<img src="images/demo_overview.png" width=800px>
 
 Click on "sf-codespace" and it resume the codespace if its stopped.
 
@@ -73,6 +73,7 @@ ctrl + c
 <img src="images/wh_query_usage.png" width=800px>
 
 ## Step 7 - Verify Unauthorized request
+
 To see what request in pending for Admin review switch to Snowflake and run:
 
 ```
