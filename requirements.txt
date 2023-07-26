@@ -1,0 +1,5 @@
+snowflake-connector-python
+altair==4.0
+streamlit
+datetime
+pandas
