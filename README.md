@@ -21,21 +21,25 @@ Start the pre-build Codespace from: (https://github.com/velnatkar4/snowflake-whm
 
 Click on "sf-codespace" and it resume the codespace if its stopped.
 
-## Step 2.2 - Build Codespace to start the application from Github
+<img src="images/open_codebase.png" width=800px>
+
+## Step 2.2 - Create new Codespace to host the application from Github
 
 From Github open code => codespaces => create codespace on main
 (https://github.com/velnatkar4/snowflake-mgmt)
 
+<img src="images/create_new_codebase.png" width=800px>
+
 You get prompted to Terminal after setup. Create new conda environment with Python 3.9 and install all required pacakges.
 
 ```
-conda create -n snowcompute python=3.9
+conda create -n snowmgmt39 python=3.9
 ```
 
 Resart the Terminal else close and open new Terminal and continue to istall supporting packages.
 
 ```
-conda activate snowcompute
+conda activate snowmgmt39
 python -m pip install -r requirements.txt
 ```
 
@@ -44,8 +48,10 @@ We have built a Streamlit application to visualize the request form, admin revie
 
 Start streamlit application from conda environment.
 ```
+conda activate snowmgmt39
 streamlit run UserRequestForm.py
 ```
+<img src="images/start_streamlit_app.png" width=800px>
 
 To stop the Streamlit Application
 ```
@@ -54,9 +60,17 @@ ctrl + c
 
 ## Step 4 - User Request large Compute
 
+<img src="images/user_request.png" width=800px>
+
 ## Step 5 - Admin review and approve and reject the request
 
+<img src="images/admin_approval.png" width=800px>
+
 ## Step 6 - Warehouse Usage
+
+<img src="images/wh_credit_usage.png" width=800px>
+
+<img src="images/wh_query_usage.png" width=800px>
 
 ## Step 7 - Verify Unauthorized request
 
