@@ -17,6 +17,8 @@ Python 3.9 version is required to run the application that is hosted on Stramlit
 ## Step 2.1 - Use Pre-Build Codespace
 Start the pre-build Codespace from: (https://github.com/velnatkar4/snowflake-whmgmt/codespaces)
 
+<img src="images/demo_overview.png" width=800px>
+
 Click on "sf-codespace" and it resume the codespace if its stopped.
 
 ## Step 2.2 - Build Codespace to start the application from Github
