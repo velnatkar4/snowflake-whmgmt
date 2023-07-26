@@ -17,8 +17,6 @@ Python 3.9 version is required to run the application that is hosted on Stramlit
 ## Step 2.1 - Use Pre-Build Codespace
 Start the pre-build Codespace from: (https://github.com/velnatkar4/snowflake-whmgmt/codespaces)
 
-<img src="images/demo_overview.png" width=800px>
-
 Click on "sf-codespace" and it resume the codespace if its stopped.
 
 <img src="images/open_codebase.png" width=800px>
@@ -60,15 +58,23 @@ ctrl + c
 
 ## Step 4 - User Request large Compute
 
+Existing Snowflake user use this form to request larger compute (SMALL, MEDIUM or LARGE) to fulfill their workload
+
 <img src="images/user_request.png" width=800px>
 
 ## Step 5 - Admin review and approve and reject the request
+
+Admin periodically review the user request and make decision based on the Warehouse usage by user
 
 <img src="images/admin_approval.png" width=800px>
 
 ## Step 6 - Warehouse Usage
 
+Warehouse credit usage for ALL warehouse or by given warehouse is presented in Bar chart for given data range
+
 <img src="images/wh_credit_usage.png" width=800px>
+
+Queries with long execution time is presented for given user.
 
 <img src="images/wh_query_usage.png" width=800px>
 
