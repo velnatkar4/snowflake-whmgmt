@@ -18,11 +18,10 @@ class wh_usage:
         with st.sidebar:
             date_from, date_to = sproc.date_selector()
 
-        # Get warehouse data by user
-        df = snowflake_run.get_data(syssql.WH001_QUERY_COUNT.format(date_from=date_from, date_to=date_to))
-        df_q=df
+        # Get data
+        df = snowflake_run.get_data(syssql.CM001_WH_CREDIT_CONSUMPTION.format(date_from=date_from, date_to=date_to))
 
-        # Add filtering widget per Warehouse Name
+        # Add filtering widget per Service type
         all_values = df["WAREHOUSE_NAME"].unique().tolist()
         selected_value = st.selectbox(
             "Choose Warehouse Name",
@@ -37,22 +36,6 @@ class wh_usage:
 
         # Filter df accordingly
         df = df[df["WAREHOUSE_NAME"].isin(selected_value)]
-
-        # Add filtering widget per User Name
-        all_usr_values = df["USER_NAME"].unique().tolist()
-        selected_usr_value = st.selectbox(
-            "Choose User Name",
-            ["All"] + all_usr_values,
-            0,
-        )
-
-        if selected_usr_value == "All":
-            selected_usr_value = all_usr_values
-        else:
-            selected_usr_value = [selected_usr_value]
-
-        # Filter df accordingly
-        df = df[df["USER_NAME"].isin(selected_usr_value)]
 
         # Get consumption
         consumption = int(df["CREDITS_USED"].sum())
@@ -83,8 +66,10 @@ class wh_usage:
         #---------------------------------------------
         # Top queries
         #---------------------------------------------    
-        st.subheader("User Top Queries")        
-        df = df_q[df_q["USER_NAME"].isin(selected_usr_value)]
+        st.subheader("User Top Queries")
+        #df=get_data(syssql.WH001_QUERY_COUNT.format(warehouse_name=selected_value))
+        df = snowflake_run.get_data(syssql.WH001_QUERY_COUNT)
+        df = df[df["WAREHOUSE_NAME"].isin(selected_value)]
         if df.empty:
             st.caption("No data found.")
         else:
@@ -92,6 +77,10 @@ class wh_usage:
                 st.dataframe(df)
           
 # Run the app
+# if __name__ == "__main__":
+#     st.title("Warehouse Compute Usage")
+#     wh_cr_usage()
+
 if __name__ == "__main__":    
     form3=wh_usage()
     conn = form3.wh_cr_usage()

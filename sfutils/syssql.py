@@ -28,16 +28,18 @@ WH001_QUERY_COUNT = """
 SELECT WAREHOUSE_NAME,
        USER_NAME,
        count(*) as query_cnt,
-       sum(TOTAL_ELAPSED_TIME)/1000 as exec_seconds,
+       sum(TOTAL_ELAPSED_TIME)/1000 as credits_used,
        --sum(TOTAL_ELAPSED_TIME)/(1000*60) as exec_minutes,
        --sum(TOTAL_ELAPSED_TIME)/(1000*60*60) as exec_hours,
+       date_trunc('hour', start_time) as start_time,
        QUERY_TEXT
 from SNOWFLAKE.ACCOUNT_USAGE.QUERY_HISTORY Q
 where 1=1
-  and Q.START_TIME::DATE >= CURRENT_DATE - 7
+  and start_time >= '{date_from}'::timestamp_ltz
+  and start_time < '{date_to}'::timestamp_ltz
   and TOTAL_ELAPSED_TIME > 0
   AND WAREHOUSE_NAME IS NOT NULL  
-group by 1,2,5
+group by 1,2,5,6
 having count(*) >= 1
 order by 1 desc
 limit 10
