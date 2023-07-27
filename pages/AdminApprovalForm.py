@@ -61,17 +61,16 @@ class admin_form:
                 st.success("**:blue[APPROVED]** user request : "+str(out_request_num))
                 snowflake_run.get_data(sql)
 
-                sql = f"""GRANT ROLE ROLE_WH_USER_L_USAGE TO ROLE ROLE_USER_JOHN;"""
+                if out_request_com.upper() == "SMALL":
+                    sql = f"""GRANT ROLE ROLE_WH_USER_S_USAGE TO ROLE ROLE_{out_request_usr};"""
+                elif out_request_com.upper() == "LARGE":
+                    sql = f"""GRANT ROLE ROLE_WH_USER_L_USAGE TO ROLE ROLE_{out_request_usr};"""
                 snowflake_run.get_data(sql)
 
             if decline:
                 st.error("**:red[DECLINED]** user request : "+str(out_request_num))
                 snowflake_run.get_data(sql)
             st.stop()
-
-# if __name__ == '__main__':
-#     st.title("Warehouse Request Review by Admin")
-#     admin_review()
 
 if __name__ == "__main__":    
     form2=admin_form()
