@@ -61,6 +61,9 @@ class admin_form:
                 st.success("**:blue[APPROVED]** user request : "+str(out_request_num))
                 snowflake_run.get_data(sql)
 
+                sql = f"""GRANT ROLE ROLE_WH_USER_L_USAGE TO ROLE ROLE_USER_JOHN;"""
+                snowflake_run.get_data(sql)
+
             if decline:
                 st.error("**:red[DECLINED]** user request : "+str(out_request_num))
                 snowflake_run.get_data(sql)
