@@ -18,7 +18,18 @@ class wh_usage:
         with st.sidebar:
             date_from, date_to = sproc.date_selector()
 
-        # Get data
+        # Get warehouse data
+        df = snowflake_run.get_data(syssql.CM001_WH_CREDIT_CONSUMPTION.format(date_from=date_from, date_to=date_to))
+
+        # Add filtering widget per Service type
+        all_values = df["WAREHOUSE_NAME"].unique().tolist()
+        selected_value = st.selectbox(
+            "Choose Warehouse Name",
+            ["All"] + all_values,
+            0,
+        )
+
+        # Get useradata data
         df = snowflake_run.get_data(syssql.CM001_WH_CREDIT_CONSUMPTION.format(date_from=date_from, date_to=date_to))
 
         # Add filtering widget per Service type

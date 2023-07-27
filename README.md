@@ -12,21 +12,25 @@ Note: For demo purpose, I have created the free trail Snowflake account and comp
 ## Step 2 - Setup Python environment using Conda
 Python 3.9 version is required to run the application that is hosted on Stramlit (https://docs.streamlit.io/knowledge-base/tutorials/databases/snowflake)
 
-## Step 2.1 - Use Pre-Build Codespace
+## Step 2.1 - Use Pre-Build Codespace from GitHub
 
 Start the pre-build Codespace from: (https://github.com/velnatkar4/snowflake-whmgmt/codespaces)
 Click on "sf-codespace" and it will resume the codespace if it's stopped.
 <img src="images/open_codebase.png" width=800px>
 
-## Step 2.2 - Create new Codespace to host the application from Github
+## Step 2.2 - Create new Codespace from Github
 
 From Github open code => codespaces => create codespace on main(https://github.com/velnatkar4/snowflake-mgmt)
 <img src="images/create_new_codebase.png" width=800px>
 You get prompted to Terminal after setup. Create a new conda environment with Python 3.9 and install all required packages.
 
-```conda create -n snowmgmt39 python=3.9```
+```
+conda create -n snowmgmt39 python=3.9
+conda init
+exit
+```
 
-Restart the Terminal, else close and open a new Terminal and continue to install supporting packages.
+Close and open a new Terminal to continue with next steps of installing packages.
 
 ```
 conda activate snowmgmt39
@@ -38,7 +42,10 @@ python -m pip install -r requirements.txt
 We have built a Streamlit application to visualize the request form, admin review and warehouse and query usage
 Start streamlit application from conda environment.
 
-```conda activate snowmgmt39streamlit run UserRequestForm.py```
+```
+conda activate snowmgmt39
+streamlit run UserRequestForm.py
+```
 
 <img src="images/start_streamlit_app.png" width=800px>
 

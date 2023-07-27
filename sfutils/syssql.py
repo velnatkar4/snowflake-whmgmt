@@ -26,25 +26,40 @@ group by 1, 2, 3;
 
 WH001_QUERY_COUNT = """
 SELECT WAREHOUSE_NAME,
-       USER_NAME,
-       count(*) as query_cnt,
-       sum(TOTAL_ELAPSED_TIME)/1000 as credits_used,
-       --sum(TOTAL_ELAPSED_TIME)/(1000*60) as exec_minutes,
-       --sum(TOTAL_ELAPSED_TIME)/(1000*60*60) as exec_hours,
+       CASE WHEN USER_NAME = 'VELNATSF' THEN 'USER_JOHN' ELSE USER_NAME END AS USER_NAME,       
+       count(QUERY_ID) as QUERY_CNT,
+       sum(TOTAL_ELAPSED_TIME)/100 as CREDITS_USED,
        date_trunc('hour', start_time) as start_time,
        QUERY_TEXT
 from SNOWFLAKE.ACCOUNT_USAGE.QUERY_HISTORY Q
 where 1=1
   and start_time >= '{date_from}'::timestamp_ltz
   and start_time < '{date_to}'::timestamp_ltz
-  and TOTAL_ELAPSED_TIME > 0
+  and TOTAL_ELAPSED_TIME > 1
   AND WAREHOUSE_NAME IS NOT NULL  
 group by 1,2,5,6
 having count(*) >= 1
 order by 1 desc
-limit 10
+LIMIT 10
 """
-#--and WAREHOUSE_NAME = '{warehouse_name}'
+
+WH001_QUERY_COUNT_V1 = """
+SELECT WAREHOUSE_NAME,
+       USER_NAME,       
+       count(QUERY_ID) as QUERY_CNT,
+       sum(CREDITS_USED)/100 as CREDITS_USED,
+       date_trunc('hour', start_time) as start_time,
+       QUERY_TEXT
+from DEMO_DB.DEMO_SCHM.QUERY_HISTORY_HST Q
+where 1=1
+  and start_time >= '{date_from}'::timestamp_ltz
+  and start_time < '{date_to}'::timestamp_ltz
+  and CREDITS_USED > 0
+  AND WAREHOUSE_NAME IS NOT NULL  
+group by 1,2,5,6
+having count(*) >= 1
+order by 1 desc
+"""
 
 RQ001_PENDING_REQUEST="""SELECT * FROM WH_REQUEST_TRACKER WHERE REVIEW_USER IS NULL LIMIT 1"""
 
