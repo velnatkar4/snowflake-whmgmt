@@ -161,3 +161,98 @@ VALUES
 SELECT REQUEST_USER,REQUEST_COMPUTE,REQUEST_REASON,
 REQUEST_TIMESTAMP,REVIEW_USER
 FROM WH_REQUEST_TRACKER;
+
+
+
+select
+'JDBC' as Driver_Name,
+min(session_tbl.logdate) as min_log_date,
+max(session_tbl.logdate) as max_log_date,
+count(session_tbl.login_event_id) as login_count,
+session_tbl.user_name,
+session_tbl.CLIENT_APPLICATION_VERSION,
+session_tbl.CLIENT_APPLICATION_ID,
+APPLICATION,
+'JDBC-'||JAVA_VERSION AS CLIENT_VERSION,
+OS_VERSION,
+OS_NAME,JAVA_VERSION2,
+logon_tbl.CLIENT_IP
+from
+((select user_name,
+created_on,
+CLIENT_APPLICATION_VERSION,
+CLIENT_APPLICATION_ID,
+--CLIENT_ENVIRONMENT,
+PARSE_JSON(CLIENT_ENVIRONMENT) AS CLIENT_ENV,
+CLIENT_ENV:APPLICATION::string AS APPLICATION,
+CLIENT_ENV:JAVA_VERSION::string AS JAVA_VERSION,
+CLIENT_ENV:OS_VERSION::string AS OS_VERSION,
+CLIENT_ENV:OS::string AS OS_NAME,
+CLIENT_ENV:JAVA_VERSION::string AS JAVA_VERSION2,
+login_event_id,
+date(created_on) as logdate 
+from SNOWFLAKE.ACCOUNT_USAGE.SESSIONS
+where CREATED_ON > current_date - 45
+AND CLIENT_APPLICATION_ID like 'JDBC%'
+)session_tbl
+left outer join
+(select event_id, event_timestamp, user_name,
+REPORTED_CLIENT_VERSION,client_ip
+from snowflake.account_usage.login_history 
+where event_timestamp > current_date - 45
+and REPORTED_CLIENT_TYPE like 'JDBC%'
+) logon_tbl
+on session_tbl.login_event_id=logon_tbl.event_id
+and session_tbl.user_name=logon_tbl.user_name
+)
+group by all;
+
+SELECT
+    CURRENT_DATE AS LOG_DATE,
+    DRIVER_NAME,
+    MIN_LOG_DATE,
+    MAX_LOG_DATE,
+    USER_NAME,
+    LOGIN_COUNT,
+    CLIENT_APPLICATION_VERSION,
+    CASE
+        WHEN DRIVER_NAME='JDBC' THEN 'JDBC 3.13.27 (or later)'
+        WHEN DRIVER_NAME='PythonConnector' THEN 'PythonConnector 3.0.0 (or later)'
+        WHEN DRIVER_NAME='SnowSQL' THEN 'SnowSql 1.2.25 (or later)'
+        WHEN DRIVER_NAME='ODBC' THEN 'ODBC 2.25.8 (or later)'
+        WHEN DRIVER_NAME='SQLAlchemy' THEN 'SQLAlchemy 1.4.6 (or later)'
+    END AS DRIVER_VERSION_RECOMMENDED,
+    SPLIT_PART(CLIENT_APPLICATION_VERSION,'.', 1)::INT AS V1,
+    SPLIT_PART(CLIENT_APPLICATION_VERSION,'.', 2)::INT AS V2,
+    SPLIT_PART(CLIENT_APPLICATION_VERSION,'.', 3)::INT AS V3,
+    CASE
+        WHEN b.DRIVER_NAME = 'JDBC' AND (V1 < 3)  THEN 'Upgrade Required'
+        WHEN b.DRIVER_NAME = 'JDBC' AND (V1 < 3+1 AND V2 < 13) THEN 'Upgrade Required'
+        WHEN b.DRIVER_NAME = 'JDBC' AND (V1 < 3+1 AND V2 < 13+1 AND V3 < 27) THEN 'Upgrade Required'
+        
+        WHEN b.DRIVER_NAME = 'PythonConnector' AND (V1 < 3)  THEN 'Upgrade Required'
+        WHEN b.DRIVER_NAME = 'PythonConnector' AND (V1 < 3+1 AND V2 < 0) THEN 'Upgrade Required'
+        WHEN b.DRIVER_NAME = 'PythonConnector' AND (V1 < 3+1 AND V2 < 0+1 AND V3 < 0) THEN 'Upgrade Required'
+        
+        WHEN b.DRIVER_NAME = 'SnowSQL' AND (V1 < 1)  THEN 'Upgrade Required'
+        WHEN b.DRIVER_NAME = 'SnowSQL' AND (V1 < 1+1 AND V2 < 2) THEN 'Upgrade Required'
+        WHEN b.DRIVER_NAME = 'SnowSQL' AND (V1 < 1+1 AND V2 < 2+1 AND V3 < 25) THEN 'Upgrade Required'
+        
+        WHEN b.DRIVER_NAME = 'ODBC' AND (V1 < 2)  THEN 'Upgrade Required'
+        WHEN b.DRIVER_NAME = 'ODBC' AND (V1 < 2+1 AND V2 < 25) THEN 'Upgrade Required'
+        WHEN b.DRIVER_NAME = 'ODBC' AND (V1 < 2+1 AND V2 < 25+1 AND V3 < 8) THEN 'Upgrade Required'
+  
+        WHEN b.DRIVER_NAME = 'SQLAlchemy' AND (V1 < 1)  THEN 'Upgrade Required'
+        WHEN b.DRIVER_NAME = 'SQLAlchemy' AND (V1 < 1+1 AND V2 < 4) THEN 'Upgrade Required'
+        WHEN b.DRIVER_NAME = 'SQLAlchemy' AND (V1 < 1+1 AND V2 < 4+1 AND V3 < 6) THEN 'Upgrade Required'
+  
+        ELSE
+            'No Action Required'
+    END AS ACTION_REQ,
+    CLIENT_APPLICATION_ID,
+    APPLICATION     AS APPLICATION_NAME,
+    CLIENT_VERSION  AS CLIENT_NAME_VERSION,
+    OS_VERSION,
+    OS_NAME,
+    JAVA_VERSION
+    FROM ..
