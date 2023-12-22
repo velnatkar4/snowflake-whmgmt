@@ -256,3 +256,80 @@ SELECT
     OS_NAME,
     JAVA_VERSION
     FROM ..
+
+
+ with
+        
+        base_access_hist AS (
+        
+           select
+               query_id "QUERY_ID",
+               user_name "USER_NAME",
+               query_start_time "START_TIME",
+               split(base.value:objectName, '.')[0]::string "DATABASE_NAME",
+               split(base.value:objectName, '.')[1]::string "SCHEMA_NAME",
+               split(base.value:objectName, '.')[2]::string "TABLE_NAME",
+               cols.value:columnName::string "COLUMN_NAME"
+           from snowflake.account_usage.access_history,
+                lateral flatten (base_objects_accessed) base,
+                lateral flatten (base.value, path => 'columns') cols
+        
+        ),
+        
+        direct_access_hist AS (
+        
+           select
+               query_id "QUERY_ID",
+               user_name "USER_NAME",
+               query_start_time "START_TIME",
+               split(direct.value:objectName, '.')[0]::string "DATABASE_NAME",
+               split(direct.value:objectName, '.')[1]::string "SCHEMA_NAME",
+               split(direct.value:objectName, '.')[2]::string "TABLE_NAME",
+               cols.value:columnName::string "COLUMN_NAME"
+           from snowflake.account_usage.access_history,
+                lateral flatten (direct_objects_accessed) direct,
+                lateral flatten (direct.value, path => 'columns') cols
+        
+        ),
+        
+        access_hist as (
+            select * from base_access_hist
+                union
+            select * from direct_access_hist
+        ),
+        
+        last_accessed AS (
+        
+           select
+               database_name,
+               schema_name,
+               table_name,
+               max(start_time) AS last_access_date,
+               max_by(user_name, start_time) as last_access_by
+           from access_hist
+           group by database_name, schema_name, table_name
+        
+        )
+        
+        select
+            tbl.table_catalog,
+            tbl.table_schema,
+            tbl.table_name,
+            tbl.table_type,
+            tbl.row_count,
+            tbl.bytes / 1024 / 1024 AS m_bytes,
+            tbl.created AS CREATED,
+            tbl.last_altered AS LAST_ALTERED,
+            tbl.last_ddl AS LAST_DDL,
+            tbl.last_ddl_by,
+            lst.last_access_date AS LAST_ACCESS_DATE,
+            lst.last_access_by
+            from [your_database].information_schema.tables as tbl
+            
+        left join last_accessed lst on
+            tbl.table_catalog = lst.database_name AND
+            tbl.table_schema = lst.schema_name AND
+            tbl.table_name = lst.table_name
+        where
+
+            and tbl.table_name not ILIKE 'snowpark_temp_table_%';
