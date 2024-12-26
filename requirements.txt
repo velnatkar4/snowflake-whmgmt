@@ -1,5 +1,4 @@
-snowflake-connector-python
-altair==4.0
+altair==5.5
 streamlit
 datetime
 pandas
